@@ -6,6 +6,7 @@
 <div class="container-fluid chat-container">
     <div class="chat-header-awaiting">
         <h3>Awaiting for participant</h3>
+        <button @onclick="GoBack" class="btn btn-secondary">Back</button>
     </div>
     <div class="chat-messages d-flex flex-column">
         @foreach (var msg in messages)
@@ -80,6 +81,12 @@
             messages.Add(new ChatMessage { Content = message, SentByMe = true });
             message = string.Empty;
         }
+    }
+
+    private void GoBack()
+    {
+        SocketService.Stop();
+        NavigationManager.NavigateTo("/");
     }
 
     public void Dispose()

@@ -13,16 +13,6 @@ public class SocketService
     private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     public event Action<string>? MessageReceived;
-
-    public async Task SendMessage(string message)
-    {
-        if (stream != null && stream.CanWrite)
-        {
-            byte[] data = Encoding.UTF8.GetBytes(message);
-            await stream.WriteAsync(data, 0, data.Length);
-        }
-    }
-
     public event Action? ConnectionEstablished;
     public event Action? ConnectionClosed;
 
@@ -50,6 +40,15 @@ public class SocketService
         ConnectionEstablished?.Invoke();
 
         _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
+    }
+
+    public async Task SendMessage(string message)
+    {
+        if (stream != null && stream.CanWrite)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(message);
+            await stream.WriteAsync(data, 0, data.Length);
+        }
     }
 
     private async Task ReceiveMessages(CancellationToken token)
@@ -83,9 +82,26 @@ public class SocketService
 
     public void Stop()
     {
-        cancellationTokenSource.Cancel();
-        stream?.Close();
-        client?.Close();
-        server?.Stop();
+        try
+        {
+            cancellationTokenSource.Cancel();
+            if (stream != null && stream.CanWrite)
+            {
+                byte[] data = Encoding.UTF8.GetBytes("disconnect");
+                stream.Write(data, 0, data.Length);
+            }
+            stream?.Close();
+            client?.Close();
+            server?.Stop();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error stopping the service: {ex.Message}");
+        }
+        finally
+        {
+            ConnectionClosed?.Invoke();
+        }
     }
+}
 }
