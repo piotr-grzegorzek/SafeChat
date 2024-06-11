@@ -16,18 +16,17 @@
     </div>
 </div>
 
-
 @code {
     string ip = "localhost";
     int port = 5000;
 
     void StartClient()
     {
-        NavigationManager.NavigateTo($"/chat?role=client;ip={ip};port={port}");
+        NavigationManager.NavigateTo($"/chat?role=client&ip={ip}&port={port}");
     }
 
     void StartServer()
     {
-        NavigationManager.NavigateTo($"/chat?role=server;ip={ip};port={port}");
+        NavigationManager.NavigateTo($"/chat?role=server&ip={ip}&port={port}");
     }
 }
