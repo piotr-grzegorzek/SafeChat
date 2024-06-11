@@ -1,69 +1,14 @@
 ﻿@page "/chat"
 @using System.Web
 @inject NavigationManager NavigationManager
-
 <div class="container-fluid chat-container">
-    <div class="chat-header">
-        <h3>This chat is well secured</h3>
+    <div class="@chatHeaderClass">
+        <h3>@chatHeaderText</h3>
     </div>
     <div class="chat-messages d-flex flex-column">
         <div class="chat-message sent">Hello! How can I help you today?</div>
         <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <div class="chat-message sent">Hello! How can I help you today?</div>
-        <div class="chat-message received">I have a question about my order.</div>
-        <!-- More messages -->
+        <!-- Messages -->
     </div>
     <div class="chat-input">
         <div class="input-group">
@@ -72,9 +17,11 @@
         </div>
     </div>
 </div>
-
 @code {
     string? role;
+    bool isAwaitingParticipant = true;
+    string chatHeaderClass => isAwaitingParticipant ? "chat-header-awaiting" : "chat-header";
+    string chatHeaderText => isAwaitingParticipant ? "Awaiting for participant" : "This chat is well secured";
 
     protected override void OnInitialized()
     {
