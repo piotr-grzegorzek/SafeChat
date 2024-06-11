@@ -8,6 +8,7 @@ public class SocketService
     private TcpClient? client;
     private NetworkStream? stream;
     private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+    private bool isStopping = false;
 
     public event Action<string>? MessageReceived;
     public event Action? ConnectionEstablished;
@@ -19,24 +20,36 @@ public class SocketService
         server.Start();
         Console.WriteLine("Waiting for a connection...");
 
-        client = await server.AcceptTcpClientAsync();
-        stream = client.GetStream();
-
-        ConnectionEstablished?.Invoke();
-
-        _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
+        try
+        {
+            client = await server.AcceptTcpClientAsync();
+            stream = client.GetStream();
+            ConnectionEstablished?.Invoke();
+            _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error starting server: {ex.Message}");
+            Stop(); // Ensure proper cleanup
+        }
     }
 
     public async Task StartClient(string host, int port)
     {
         client = new TcpClient();
-        await client.ConnectAsync(host, port);
-        stream = client.GetStream();
-        Console.WriteLine($"Connected to server {host}:{port}");
-
-        ConnectionEstablished?.Invoke();
-
-        _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
+        try
+        {
+            await client.ConnectAsync(host, port);
+            stream = client.GetStream();
+            Console.WriteLine($"Connected to server {host}:{port}");
+            ConnectionEstablished?.Invoke();
+            _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error connecting to server: {ex.Message}");
+            Stop(); // Ensure proper cleanup
+        }
     }
 
     public async Task SendMessage(string message)
@@ -74,13 +87,17 @@ public class SocketService
             }
         }
 
-        ConnectionClosed?.Invoke();
+        if (!isStopping)
+        {
+            ConnectionClosed?.Invoke();
+        }
     }
 
     public void Stop()
     {
         try
         {
+            isStopping = true;
             cancellationTokenSource.Cancel();
             if (stream != null && stream.CanWrite)
             {
@@ -107,6 +124,7 @@ public class SocketService
         server = null;
         client = null;
         stream = null;
+        isStopping = false;
         cancellationTokenSource = new CancellationTokenSource();
     }
 }

@@ -4,9 +4,8 @@
 @inject SocketService SocketService
 
 <div class="container-fluid chat-container">
-    <div class="chat-header-awaiting">
-        <h3>Awaiting for participant</h3>
-        <button @onclick="GoBack" class="btn btn-secondary">Back</button>
+    <div class="@(isConnected ? "chat-header-connected" : "chat-header-awaiting")">
+        <h3>@(isConnected ? "Connected - Chat is safe!" : "Awaiting for participant")</h3>
     </div>
     <div class="chat-messages d-flex flex-column">
         @foreach (var msg in messages)
@@ -15,11 +14,13 @@
         }
     </div>
     <div class="chat-input">
+        <button @onclick="GoBack" class="btn btn-secondary">Back</button>
         <div class="input-group">
             <input type="text" @bind="message" class="form-control" placeholder="Type a message..."
-                disabled="@(!isConnected)">
-            <button class="btn btn-primary" type="button" @onclick="SendMessage"
-                disabled="@(!isConnected)">Send</button>
+                @onkeyup="HandleEnterKey" disabled="@(!isConnected)">
+            <button class="btn btn-primary" type="button" @onclick="SendMessage" disabled="@(!isConnected)">
+                Send
+            </button>
         </div>
     </div>
 </div>
@@ -30,6 +31,7 @@
     string? ip;
     string? port;
     bool isConnected = false;
+    bool connectionFailed = false;
 
     List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -44,33 +46,48 @@
         SocketService.ConnectionEstablished += OnConnectionEstablished;
         SocketService.ConnectionClosed += OnConnectionClosed;
 
-        if (role == "client")
+        try
         {
-            await SocketService.StartClient(ip, int.Parse(port));
+            if (role == "client")
+            {
+                await SocketService.StartClient(ip, int.Parse(port));
+            }
+            else if (role == "server")
+            {
+                await SocketService.StartServer(ip, int.Parse(port));
+            }
         }
-        else if (role == "server")
+        catch (Exception)
         {
-            await SocketService.StartServer(ip, int.Parse(port));
+            connectionFailed = true;
+            GoBack(); // Navigate back if connection fails
         }
     }
 
     private void OnConnectionEstablished()
     {
         isConnected = true;
+        connectionFailed = false;
         InvokeAsync(StateHasChanged);
     }
 
     private void OnConnectionClosed()
     {
         isConnected = false;
-        messages.Add(new ChatMessage { Content = "Connection closed.", SentByMe = false });
+        if (!connectionFailed)
+        {
+            messages.Add(new ChatMessage { Content = "Connection closed.", SentByMe = false });
+        }
         InvokeAsync(StateHasChanged);
     }
 
     private void OnMessageReceived(string message)
     {
-        messages.Add(new ChatMessage { Content = message, SentByMe = false });
-        InvokeAsync(StateHasChanged);
+        if (message != "disconnect")
+        {
+            messages.Add(new ChatMessage { Content = message, SentByMe = false });
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task SendMessage()
@@ -80,12 +97,21 @@
             await SocketService.SendMessage(message);
             messages.Add(new ChatMessage { Content = message, SentByMe = true });
             message = string.Empty;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void HandleEnterKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" || e.Key == "NumpadEnter")
+        {
+            SendMessage();
         }
     }
 
     private void GoBack()
     {
-        SocketService.Stop();
+        Dispose();
         NavigationManager.NavigateTo("/");
     }
 
