@@ -1,9 +1,6 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 public class SocketService
 {
@@ -100,7 +97,16 @@ public class SocketService
         }
         finally
         {
+            Reset();
             ConnectionClosed?.Invoke();
         }
+    }
+
+    private void Reset()
+    {
+        server = null;
+        client = null;
+        stream = null;
+        cancellationTokenSource = new CancellationTokenSource();
     }
 }
