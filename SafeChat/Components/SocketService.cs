@@ -14,6 +14,18 @@ public class SocketService
 
     public event Action<string>? MessageReceived;
 
+    public async Task SendMessage(string message)
+    {
+        if (stream != null && stream.CanWrite)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(message);
+            await stream.WriteAsync(data, 0, data.Length);
+        }
+    }
+
+    public event Action? ConnectionEstablished;
+    public event Action? ConnectionClosed;
+
     public async Task StartServer(string host, int port)
     {
         server = new TcpListener(IPAddress.Parse(host), port);
@@ -22,6 +34,8 @@ public class SocketService
 
         client = await server.AcceptTcpClientAsync();
         stream = client.GetStream();
+
+        ConnectionEstablished?.Invoke();
 
         _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
     }
@@ -33,16 +47,9 @@ public class SocketService
         stream = client.GetStream();
         Console.WriteLine($"Connected to server {host}:{port}");
 
-        _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
-    }
+        ConnectionEstablished?.Invoke();
 
-    public async Task SendMessage(string message)
-    {
-        if (stream != null && stream.CanWrite)
-        {
-            byte[] data = Encoding.UTF8.GetBytes(message);
-            await stream.WriteAsync(data, 0, data.Length);
-        }
+        _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
     }
 
     private async Task ReceiveMessages(CancellationToken token)
@@ -59,6 +66,10 @@ public class SocketService
                     string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                     MessageReceived?.Invoke(message);
                 }
+                else
+                {
+                    break;
+                }
             }
             catch (Exception e)
             {
@@ -66,6 +77,8 @@ public class SocketService
                 break;
             }
         }
+
+        ConnectionClosed?.Invoke();
     }
 
     public void Stop()
