@@ -1,7 +1,33 @@
 ﻿@page "/"
+@inject NavigationManager NavigationManager
 
-<h3>Initialization</h3>
+<div class="form-container">
+    <div class="form-group">
+        <label for="ip">IP:</label>
+        <input id="ip" type="text" @bind="ip" class="form-control" />
+
+        <label for="port">Port:</label>
+        <input id="port" type="number" @bind="port" class="form-control" />
+
+        <div class="button-group">
+            <button @onclick="StartClient" class="btn btn-primary">Client</button>
+            <button @onclick="StartServer" class="btn btn-secondary">Server</button>
+        </div>
+    </div>
+</div>
+
 
 @code {
+    string ip = "localhost";
+    int port = 5000;
 
+    void StartClient()
+    {
+        NavigationManager.NavigateTo("/chat?role=client");
+    }
+
+    void StartServer()
+    {
+        NavigationManager.NavigateTo("/chat?role=server");
+    }
 }

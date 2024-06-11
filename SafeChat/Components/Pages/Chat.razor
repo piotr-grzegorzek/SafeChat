@@ -1,0 +1,13 @@
+﻿@page "/chat"
+@using System.Web
+@inject NavigationManager NavigationManager
+
+@code {
+    string? role;
+
+    protected override void OnInitialized()
+    {
+        Uri uri = new(NavigationManager.Uri);
+        role = HttpUtility.ParseQueryString(uri.Query).Get("role");
+    }
+}
