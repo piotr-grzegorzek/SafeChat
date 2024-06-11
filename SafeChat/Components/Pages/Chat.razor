@@ -2,8 +2,8 @@
 @using System.Web
 @inject NavigationManager NavigationManager
 <div class="container-fluid chat-container">
-    <div class="@chatHeaderClass">
-        <h3>@chatHeaderText</h3>
+    <div class="chat-header-awaiting">
+        <h3>Awaiting for participant</h3>
     </div>
     <div class="chat-messages d-flex flex-column">
         <div class="chat-message sent">Hello! How can I help you today?</div>
@@ -12,20 +12,30 @@
     </div>
     <div class="chat-input">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Type a message...">
+            <input type="text" @bind="message" class="form-control" placeholder="Type a message...">
             <button class="btn btn-primary" type="button">Send</button>
         </div>
     </div>
 </div>
+
 @code {
+    string message = "";
     string? role;
-    bool isAwaitingParticipant = true;
-    string chatHeaderClass => isAwaitingParticipant ? "chat-header-awaiting" : "chat-header";
-    string chatHeaderText => isAwaitingParticipant ? "Awaiting for participant" : "This chat is well secured";
 
     protected override void OnInitialized()
     {
         Uri uri = new(NavigationManager.Uri);
         role = HttpUtility.ParseQueryString(uri.Query).Get("role");
+        string? ip = HttpUtility.ParseQueryString(uri.Query).Get("ip");
+        string? port = HttpUtility.ParseQueryString(uri.Query).Get("port");
+
+        if (role == "client")
+        {
+
+        }
+        else if (role == "server")
+        {
+
+        }
     }
 }
