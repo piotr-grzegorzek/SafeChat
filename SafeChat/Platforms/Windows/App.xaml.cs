@@ -19,5 +19,4 @@ namespace SafeChat.WinUI
 
         protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     }
-
 }
