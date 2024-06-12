@@ -33,6 +33,7 @@ namespace SafeChat
                 catch (Exception)
                 {
                     Stop();
+                    throw;
                 }
             }
             else if (role == "client")
@@ -48,6 +49,7 @@ namespace SafeChat
                 catch (Exception)
                 {
                     Stop();
+                    throw;
                 }
             }
         }
