@@ -48,14 +48,7 @@
 
         try
         {
-            if (role == "client")
-            {
-                await SocketService.StartClient(ip, int.Parse(port));
-            }
-            else if (role == "server")
-            {
-                await SocketService.StartServer(ip, int.Parse(port));
-            }
+            await SocketService.StartConnection(role, ip, int.Parse(port));
         }
         catch (Exception)
         {

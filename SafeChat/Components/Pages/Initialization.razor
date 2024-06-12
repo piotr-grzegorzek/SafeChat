@@ -10,8 +10,8 @@
         <input id="port" type="number" @bind="port" class="form-control" />
 
         <div class="button-group">
-            <button @onclick="StartClient" class="btn btn-primary">Client</button>
-            <button @onclick="StartServer" class="btn btn-secondary">Server</button>
+            <button @onclick="@(async () => await StartConnection("client"))" class="btn btn-primary">Client</button>
+            <button @onclick="@(async () => await StartConnection("server"))" class="btn btn-secondary">Server</button>
         </div>
     </div>
 </div>
@@ -20,13 +20,8 @@
     string ip = "127.0.0.1";
     int port = 5000;
 
-    void StartClient()
+    async Task StartConnection(string role)
     {
-        NavigationManager.NavigateTo($"/chat?role=client&ip={ip}&port={port}");
-    }
-
-    void StartServer()
-    {
-        NavigationManager.NavigateTo($"/chat?role=server&ip={ip}&port={port}");
+        NavigationManager.NavigateTo($"/chat?role={role}&ip={ip}&port={port}");
     }
 }

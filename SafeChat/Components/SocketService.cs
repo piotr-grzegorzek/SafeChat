@@ -14,41 +14,43 @@ public class SocketService
     public event Action? ConnectionEstablished;
     public event Action? ConnectionClosed;
 
-    public async Task StartServer(string host, int port)
+    public async Task StartConnection(string role, string host, int port)
     {
-        server = new TcpListener(IPAddress.Parse(host), port);
-        server.Start();
-        Console.WriteLine("Waiting for a connection...");
+        if (role == "server")
+        {
+            server = new TcpListener(IPAddress.Parse(host), port);
+            server.Start();
+            Console.WriteLine("Waiting for a connection...");
 
-        try
-        {
-            client = await server.AcceptTcpClientAsync();
-            stream = client.GetStream();
-            ConnectionEstablished?.Invoke();
-            _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
+            try
+            {
+                client = await server.AcceptTcpClientAsync();
+                stream = client.GetStream();
+                ConnectionEstablished?.Invoke();
+                _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error starting server: {ex.Message}");
+                Stop(); // Ensure proper cleanup
+            }
         }
-        catch (Exception ex)
+        else if (role == "client")
         {
-            Console.WriteLine($"Error starting server: {ex.Message}");
-            Stop(); // Ensure proper cleanup
-        }
-    }
-
-    public async Task StartClient(string host, int port)
-    {
-        client = new TcpClient();
-        try
-        {
-            await client.ConnectAsync(host, port);
-            stream = client.GetStream();
-            Console.WriteLine($"Connected to server {host}:{port}");
-            ConnectionEstablished?.Invoke();
-            _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error connecting to server: {ex.Message}");
-            Stop(); // Ensure proper cleanup
+            client = new TcpClient();
+            try
+            {
+                await client.ConnectAsync(host, port);
+                stream = client.GetStream();
+                Console.WriteLine($"Connected to server {host}:{port}");
+                ConnectionEstablished?.Invoke();
+                _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error connecting to server: {ex.Message}");
+                Stop(); // Ensure proper cleanup
+            }
         }
     }
 
