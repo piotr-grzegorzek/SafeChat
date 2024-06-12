@@ -1,8 +1,8 @@
 ﻿@page "/chat"
 @using System.Web
 @inject NavigationManager NavigationManager
-@inject IConnectionService ConnectionService
-@inject IMessageService MessageService
+@inject ConnectionService ConnectionService
+@inject MessageService MessageService
 
 <div class="container-fluid chat-container">
     <div class="@(isConnected ? "chat-header-connected" : "chat-header-awaiting")">
@@ -32,7 +32,6 @@
     string? ip;
     string? port;
     bool isConnected = false;
-    bool connectionFailed = false;
 
     List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -60,14 +59,11 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error during connection: {ex.Message}");
-                connectionFailed = true;
-                GoBack(); // Navigate back if connection fails
+                GoBack();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Initialization error: {ex.Message}");
             GoBack();
         }
     }
@@ -75,7 +71,8 @@
     private void OnConnectionEstablished()
     {
         isConnected = true;
-        connectionFailed = false;
+        MessageService.PassConnectionParams(ConnectionService.Stream, ConnectionService.CancellationTokenSource);
+        MessageService.StartReceivingMessages();
         InvokeAsync(StateHasChanged);
     }
 

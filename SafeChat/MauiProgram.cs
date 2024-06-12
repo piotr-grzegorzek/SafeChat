@@ -20,8 +20,13 @@ namespace SafeChat
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
 #endif
-            builder.Services.AddScoped<ISocketService, SocketService>();
-
+            AppDomain.CurrentDomain.FirstChanceException += (s, e) =>
+            {
+                System.Diagnostics.Debug.WriteLine("********** OMG! FirstChanceException **********");
+                System.Diagnostics.Debug.WriteLine(e.Exception);
+            };
+            builder.Services.AddSingleton<ConnectionService, GenericConnectionService>();
+            builder.Services.AddSingleton<MessageService, SecureMessageService>();
 
             return builder.Build();
         }
