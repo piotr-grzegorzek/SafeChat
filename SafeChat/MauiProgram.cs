@@ -20,8 +20,7 @@ namespace SafeChat
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
 #endif
-
-            builder.Services.AddSingleton<SocketService>();
+            builder.Services.AddScoped<ISocketService, SocketService>();
 
 
             return builder.Build();

@@ -1,7 +1,7 @@
 ﻿@page "/chat"
 @using System.Web
 @inject NavigationManager NavigationManager
-@inject SocketService SocketService
+@inject ISocketService SocketService
 
 <div class="container-fluid chat-container">
     <div class="@(isConnected ? "chat-header-connected" : "chat-header-awaiting")">
@@ -37,23 +37,37 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Uri uri = new(NavigationManager.Uri);
-        role = HttpUtility.ParseQueryString(uri.Query).Get("role");
-        ip = HttpUtility.ParseQueryString(uri.Query).Get("ip");
-        port = HttpUtility.ParseQueryString(uri.Query).Get("port");
-
-        SocketService.MessageReceived += OnMessageReceived;
-        SocketService.ConnectionEstablished += OnConnectionEstablished;
-        SocketService.ConnectionClosed += OnConnectionClosed;
-
         try
         {
-            await SocketService.StartConnection(role, ip, int.Parse(port));
+            Uri uri = new(NavigationManager.Uri);
+            role = HttpUtility.ParseQueryString(uri.Query).Get("role");
+            ip = HttpUtility.ParseQueryString(uri.Query).Get("ip");
+            port = HttpUtility.ParseQueryString(uri.Query).Get("port");
+
+            if (role == null || ip == null || port == null)
+            {
+                throw new ArgumentException("Role, IP, or port is missing in the query parameters.");
+            }
+
+            SocketService.MessageReceived += OnMessageReceived;
+            SocketService.ConnectionEstablished += OnConnectionEstablished;
+            SocketService.ConnectionClosed += OnConnectionClosed;
+
+            try
+            {
+                await SocketService.StartConnection(role, ip, int.Parse(port));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during connection: {ex.Message}");
+                connectionFailed = true;
+                GoBack(); // Navigate back if connection fails
+            }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            connectionFailed = true;
-            GoBack(); // Navigate back if connection fails
+            Console.WriteLine($"Initialization error: {ex.Message}");
+            GoBack();
         }
     }
 

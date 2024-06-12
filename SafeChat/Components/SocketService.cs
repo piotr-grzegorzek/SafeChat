@@ -1,18 +1,19 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-public class SocketService
+public class SocketService : ISocketService
 {
+    public event Action<string>? MessageReceived;
+    public event Action? ConnectionEstablished;
+    public event Action? ConnectionClosed;
+
     private TcpListener? server;
     private TcpClient? client;
     private NetworkStream? stream;
     private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     private bool isStopping = false;
-
-    public event Action<string>? MessageReceived;
-    public event Action? ConnectionEstablished;
-    public event Action? ConnectionClosed;
 
     public async Task StartConnection(string role, string host, int port)
     {
@@ -63,6 +64,32 @@ public class SocketService
         }
     }
 
+    public void Stop()
+    {
+        try
+        {
+            isStopping = true;
+            cancellationTokenSource.Cancel();
+            if (stream != null && stream.CanWrite)
+            {
+                byte[] data = Encoding.UTF8.GetBytes("disconnect");
+                stream.Write(data, 0, data.Length);
+            }
+            stream?.Close();
+            client?.Close();
+            server?.Stop();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error stopping the service: {ex.Message}");
+        }
+        finally
+        {
+            Reset();
+            ConnectionClosed?.Invoke();
+        }
+    }
+
     private async Task ReceiveMessages(CancellationToken token)
     {
         byte[] buffer = new byte[1024];
@@ -91,32 +118,6 @@ public class SocketService
 
         if (!isStopping)
         {
-            ConnectionClosed?.Invoke();
-        }
-    }
-
-    public void Stop()
-    {
-        try
-        {
-            isStopping = true;
-            cancellationTokenSource.Cancel();
-            if (stream != null && stream.CanWrite)
-            {
-                byte[] data = Encoding.UTF8.GetBytes("disconnect");
-                stream.Write(data, 0, data.Length);
-            }
-            stream?.Close();
-            client?.Close();
-            server?.Stop();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error stopping the service: {ex.Message}");
-        }
-        finally
-        {
-            Reset();
             ConnectionClosed?.Invoke();
         }
     }
