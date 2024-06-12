@@ -81,20 +81,13 @@
     private void OnConnectionClosed()
     {
         isConnected = false;
-        if (!connectionFailed)
-        {
-            messages.Add(new ChatMessage { Content = "Connection closed.", SentByMe = false });
-        }
         InvokeAsync(StateHasChanged);
     }
 
     private void OnMessageReceived(string message)
     {
-        if (message != "disconnect")
-        {
-            messages.Add(new ChatMessage { Content = message, SentByMe = false });
-            InvokeAsync(StateHasChanged);
-        }
+        messages.Add(new ChatMessage { Content = message, SentByMe = false });
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task SendMessage()

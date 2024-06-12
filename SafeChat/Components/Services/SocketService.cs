@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -72,7 +71,7 @@ public class SocketService : ISocketService
             cancellationTokenSource.Cancel();
             if (stream != null && stream.CanWrite)
             {
-                byte[] data = Encoding.UTF8.GetBytes("disconnect");
+                byte[] data = Encoding.UTF8.GetBytes("Connection closed.");
                 stream.Write(data, 0, data.Length);
             }
             stream?.Close();
