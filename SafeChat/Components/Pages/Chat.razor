@@ -1,7 +1,8 @@
 ﻿@page "/chat"
 @using System.Web
 @inject NavigationManager NavigationManager
-@inject ISocketService SocketService
+@inject IConnectionService ConnectionService
+@inject IMessageService MessageService
 
 <div class="container-fluid chat-container">
     <div class="@(isConnected ? "chat-header-connected" : "chat-header-awaiting")">
@@ -49,13 +50,13 @@
                 throw new ArgumentException("Role, IP, or port is missing in the query parameters.");
             }
 
-            SocketService.MessageReceived += OnMessageReceived;
-            SocketService.ConnectionEstablished += OnConnectionEstablished;
-            SocketService.ConnectionClosed += OnConnectionClosed;
+            ConnectionService.ConnectionEstablished += OnConnectionEstablished;
+            ConnectionService.ConnectionClosed += OnConnectionClosed;
+            MessageService.MessageReceived += OnMessageReceived;
 
             try
             {
-                await SocketService.StartConnection(role, ip, int.Parse(port));
+                await ConnectionService.StartConnection(role, ip, int.Parse(port));
             }
             catch (Exception ex)
             {
@@ -94,7 +95,7 @@
     {
         if (!string.IsNullOrWhiteSpace(message))
         {
-            await SocketService.SendMessage(message);
+            await MessageService.SendMessage(message);
             messages.Add(new ChatMessage { Content = message, SentByMe = true });
             message = string.Empty;
             await InvokeAsync(StateHasChanged);
@@ -117,10 +118,10 @@
 
     public void Dispose()
     {
-        SocketService.MessageReceived -= OnMessageReceived;
-        SocketService.ConnectionEstablished -= OnConnectionEstablished;
-        SocketService.ConnectionClosed -= OnConnectionClosed;
-        SocketService.Stop();
+        ConnectionService.ConnectionEstablished -= OnConnectionEstablished;
+        ConnectionService.ConnectionClosed -= OnConnectionClosed;
+        MessageService.MessageReceived -= OnMessageReceived;
+        ConnectionService.Stop();
     }
 
     public class ChatMessage

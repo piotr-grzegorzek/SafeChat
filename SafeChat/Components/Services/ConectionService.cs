@@ -1,10 +1,11 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
-public class SocketService : ISocketService
+public class ConnectionService : IConnectionService
 {
-    public event Action<string>? MessageReceived;
     public event Action? ConnectionEstablished;
     public event Action? ConnectionClosed;
 
@@ -27,7 +28,6 @@ public class SocketService : ISocketService
                 client = await server.AcceptTcpClientAsync();
                 stream = client.GetStream();
                 ConnectionEstablished?.Invoke();
-                _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
             }
             catch (Exception ex)
             {
@@ -44,7 +44,6 @@ public class SocketService : ISocketService
                 stream = client.GetStream();
                 Console.WriteLine($"Connected to server {host}:{port}");
                 ConnectionEstablished?.Invoke();
-                _ = Task.Run(() => ReceiveMessages(cancellationTokenSource.Token));
             }
             catch (Exception ex)
             {
@@ -54,26 +53,12 @@ public class SocketService : ISocketService
         }
     }
 
-    public async Task SendMessage(string message)
-    {
-        if (stream != null && stream.CanWrite)
-        {
-            byte[] data = Encoding.UTF8.GetBytes(message);
-            await stream.WriteAsync(data, 0, data.Length);
-        }
-    }
-
     public void Stop()
     {
         try
         {
             isStopping = true;
             cancellationTokenSource.Cancel();
-            if (stream != null && stream.CanWrite)
-            {
-                byte[] data = Encoding.UTF8.GetBytes("Connection closed.");
-                stream.Write(data, 0, data.Length);
-            }
             stream?.Close();
             client?.Close();
             server?.Stop();
@@ -85,38 +70,6 @@ public class SocketService : ISocketService
         finally
         {
             Reset();
-            ConnectionClosed?.Invoke();
-        }
-    }
-
-    private async Task ReceiveMessages(CancellationToken token)
-    {
-        byte[] buffer = new byte[1024];
-
-        while (!token.IsCancellationRequested)
-        {
-            try
-            {
-                int bytesRead = await stream!.ReadAsync(buffer, 0, buffer.Length, token);
-                if (bytesRead > 0)
-                {
-                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    MessageReceived?.Invoke(message);
-                }
-                else
-                {
-                    break;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error: {e.Message}");
-                break;
-            }
-        }
-
-        if (!isStopping)
-        {
             ConnectionClosed?.Invoke();
         }
     }
