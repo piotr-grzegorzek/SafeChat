@@ -1,0 +1,337 @@
+root = true
+
+[*.{cs,razor}]
+#UNT0001: Unity messages are called by the runtime even if they're empty. Remove them to avoid unnecessary processing.
+dotnet_diagnostic.UNT0001.severity = warning
+
+# UNT0008: Null propagation on Unity objects
+dotnet_diagnostic.UNT0008.severity = warning
+
+# UNT0016
+dotnet_diagnostic.UNT0016.severity = warning
+
+# UNT0024
+dotnet_diagnostic.UNT0024.severity = warning
+
+#UNT0026
+dotnet_diagnostic.UNT0026.severity = warning
+
+#IDE0066
+dotnet_diagnostic.IDE0066.severity = warning
+
+# IDE0005: Using directive is unnecessary
+dotnet_diagnostic.IDE0005.severity = warning
+
+# IDE0044: Add readonly modifier
+dotnet_diagnostic.IDE0044.severity = warning
+
+# IDE0051: Remove unused private members
+dotnet_diagnostic.IDE0052.severity = warning
+
+# Nullable context
+dotnet_diagnostic.CS8597.severity = warning
+dotnet_diagnostic.CS8600.severity = warning
+dotnet_diagnostic.CS8601.severity = warning
+dotnet_diagnostic.CS8602.severity = warning
+dotnet_diagnostic.CS8603.severity = warning
+dotnet_diagnostic.CS8604.severity = warning
+dotnet_diagnostic.CS8605.severity = warning
+dotnet_diagnostic.CS8607.severity = warning
+dotnet_diagnostic.CS8608.severity = warning
+dotnet_diagnostic.CS8609.severity = warning
+dotnet_diagnostic.CS8610.severity = warning
+dotnet_diagnostic.CS8611.severity = warning
+dotnet_diagnostic.CS8612.severity = warning
+dotnet_diagnostic.CS8613.severity = warning
+dotnet_diagnostic.CS8614.severity = warning
+dotnet_diagnostic.CS8615.severity = warning
+dotnet_diagnostic.CS8616.severity = warning
+dotnet_diagnostic.CS8617.severity = warning
+dotnet_diagnostic.CS8618.severity = warning
+dotnet_diagnostic.CS8619.severity = warning
+dotnet_diagnostic.CS8620.severity = warning
+dotnet_diagnostic.CS8621.severity = warning
+dotnet_diagnostic.CS8622.severity = warning
+dotnet_diagnostic.CS8624.severity = warning
+dotnet_diagnostic.CS8625.severity = warning
+dotnet_diagnostic.CS8629.severity = warning
+dotnet_diagnostic.CS8631.severity = warning
+dotnet_diagnostic.CS8633.severity = warning
+dotnet_diagnostic.CS8634.severity = warning
+dotnet_diagnostic.CS8643.severity = warning
+dotnet_diagnostic.CS8644.severity = warning
+dotnet_diagnostic.CS8645.severity = warning
+dotnet_diagnostic.CS8655.severity = warning
+dotnet_diagnostic.CS8667.severity = warning
+dotnet_diagnostic.CS8670.severity = warning
+dotnet_diagnostic.CS8714.severity = warning
+dotnet_diagnostic.CS8762.severity = warning
+dotnet_diagnostic.CS8763.severity = warning
+dotnet_diagnostic.CS8764.severity = warning
+dotnet_diagnostic.CS8765.severity = warning
+dotnet_diagnostic.CS8766.severity = warning
+dotnet_diagnostic.CS8767.severity = warning
+dotnet_diagnostic.CS8768.severity = warning
+dotnet_diagnostic.CS8769.severity = warning
+dotnet_diagnostic.CS8770.severity = warning
+dotnet_diagnostic.CS8774.severity = warning
+dotnet_diagnostic.CS8775.severity = warning
+dotnet_diagnostic.CS8776.severity = warning
+dotnet_diagnostic.CS8777.severity = warning
+dotnet_diagnostic.CS8819.severity = warning
+dotnet_diagnostic.CS8824.severity = warning
+dotnet_diagnostic.CS8825.severity = warning
+dotnet_diagnostic.CS8847.severity = warning
+
+trim_trailing_whitespace = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_indent_block_contents
+csharp_indent_block_contents = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_indent_braces
+csharp_indent_braces = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_indent_case_contents
+csharp_indent_case_contents = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_indent_labels
+csharp_indent_labels = one_less_than_current
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_indent_switch_labels
+csharp_indent_switch_labels = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_new_line_before_catch
+csharp_new_line_before_catch = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_new_line_before_else
+csharp_new_line_before_else = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_new_line_before_finally
+csharp_new_line_before_finally = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_new_line_before_members_in_anonymous_types
+csharp_new_line_before_members_in_anonymous_types = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_new_line_before_members_in_object_initializers
+csharp_new_line_before_members_in_object_initializers = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_new_line_before_open_brace
+csharp_new_line_before_open_brace = all
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_new_line_between_query_expression_clauses
+csharp_new_line_between_query_expression_clauses = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_prefer_braces
+csharp_prefer_braces = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_prefer_simple_default_expression
+csharp_prefer_simple_default_expression = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_preserve_single_line_blocks
+csharp_preserve_single_line_blocks = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_preserve_single_line_statements
+csharp_preserve_single_line_statements = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_after_cast
+csharp_space_after_cast = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_after_colon_in_inheritance_clause
+csharp_space_after_colon_in_inheritance_clause = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_after_comma
+csharp_space_after_comma = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_after_dot
+csharp_space_after_dot = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_after_keywords_in_control_flow_statements
+csharp_space_after_keywords_in_control_flow_statements = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_after_semicolon_in_for_statement
+csharp_space_after_semicolon_in_for_statement = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_around_binary_operators
+csharp_space_around_binary_operators = before_and_after
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_around_declaration_statements
+csharp_space_around_declaration_statements = do_not_ignore
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_before_colon_in_inheritance_clause
+csharp_space_before_colon_in_inheritance_clause = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_before_comma
+csharp_space_before_comma = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_before_dot
+csharp_space_before_dot = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_before_open_square_brackets
+csharp_space_before_open_square_brackets = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_before_semicolon_in_for_statement
+csharp_space_before_semicolon_in_for_statement = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_empty_square_brackets
+csharp_space_between_empty_square_brackets = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_method_call_empty_parameter_list_parentheses
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_method_call_name_and_opening_parenthesis
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_method_call_parameter_list_parentheses
+csharp_space_between_method_call_parameter_list_parentheses = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_method_declaration_empty_parameter_list_parentheses
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_method_declaration_name_and_open_parenthesis
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_method_declaration_parameter_list_parentheses
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_parentheses
+csharp_space_between_parentheses = none
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_space_between_square_brackets
+csharp_space_between_square_brackets = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_conditional_delegate_call
+csharp_style_conditional_delegate_call = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_expression_bodied_accessors
+csharp_style_expression_bodied_accessors = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_expression_bodied_constructors
+csharp_style_expression_bodied_constructors = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_expression_bodied_indexers
+csharp_style_expression_bodied_indexers = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_expression_bodied_methods
+csharp_style_expression_bodied_methods = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_expression_bodied_operators
+csharp_style_expression_bodied_operators =true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_expression_bodied_properties
+csharp_style_expression_bodied_properties = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_inlined_variable_declaration
+csharp_style_inlined_variable_declaration = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_pattern_matching_over_as_with_null_check
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_pattern_matching_over_is_with_cast_check
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_throw_expression
+csharp_style_throw_expression = true:warning
+
+# implicit object creation when type is apparent
+csharp_style_implicit_object_creation_when_type_is_apparent = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_var_for_built_in_types
+csharp_style_var_for_built_in_types = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#csharp_style_var_when_type_is_apparent
+csharp_style_var_when_type_is_apparent = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_sort_system_directives_first
+dotnet_sort_system_directives_first = true
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_coalesce_expression
+dotnet_style_coalesce_expression = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_collection_initializer
+dotnet_style_collection_initializer = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_explicit_tuple_names
+dotnet_style_explicit_tuple_names = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_null_propagation
+dotnet_style_null_propagation = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_object_initializer
+dotnet_style_object_initializer = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_predefined_type_for_locals_parameters_members
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_predefined_type_for_member_access
+dotnet_style_predefined_type_for_member_access = true:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_qualification_for_event
+dotnet_style_qualification_for_event = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_qualification_for_field
+dotnet_style_qualification_for_field = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_qualification_for_method
+dotnet_style_qualification_for_method = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#dotnet_style_qualification_for_property
+dotnet_style_qualification_for_property = false:warning
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#end_of_line
+end_of_line = crlf
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#indent_size
+indent_size = 4
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#indent_style
+indent_style = space
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#insert_final_newline
+insert_final_newline = false
+
+# http://kent-boogaart.com/blog/editorconfig-reference-for-c-developers#tab_width
+tab_width = 4
+
+# unused variables
+csharp_style_unused_value_assignment_preference = discard_variable:warning
+
+# private
+dotnet_naming_rule.private_members_with_underscore.symbols  = private_fields
+dotnet_naming_rule.private_members_with_underscore.style    = prefix_underscore
+dotnet_naming_rule.private_members_with_underscore.severity = warning
+dotnet_naming_symbols.private_fields.applicable_kinds           = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.prefix_underscore.capitalization = camel_case
+dotnet_naming_style.prefix_underscore.required_prefix = _
+
+dotnet_naming_symbols.non_private_field_symbol.applicable_kinds = field
+dotnet_naming_symbols.non_private_field_symbol.applicable_accessibilities = public,internal,friend,protected,protected_internal,protected_friend
+dotnet_naming_style.non_private_field_style.capitalization = pascal_case
+dotnet_naming_rule.non_private_fields_are_pascal_case.severity = warning
+dotnet_naming_rule.non_private_fields_are_pascal_case.symbols = non_private_field_symbol
+dotnet_naming_rule.non_private_fields_are_pascal_case.style = non_private_field_style
+
+dotnet_naming_symbols.parameter_symbol.applicable_kinds = parameter
+dotnet_naming_style.parameter_style.capitalization = camel_case
+dotnet_naming_rule.parameters_are_camel_case.severity = warning
+dotnet_naming_rule.parameters_are_camel_case.symbols = parameter_symbol
+dotnet_naming_rule.parameters_are_camel_case.style = parameter_style
+
+dotnet_naming_symbols.non_interface_type_symbol.applicable_kinds = class,struct,enum,delegate
+dotnet_naming_style.non_interface_type_style.capitalization = pascal_case
+dotnet_naming_rule.non_interface_types_are_pascal_case.severity = warning
+dotnet_naming_rule.non_interface_types_are_pascal_case.symbols = non_interface_type_symbol
+dotnet_naming_rule.non_interface_types_are_pascal_case.style = non_interface_type_style
+
+dotnet_naming_symbols.interface_type_symbol.applicable_kinds = interface
+dotnet_naming_style.interface_type_style.capitalization = pascal_case
+dotnet_naming_style.interface_type_style.required_prefix = I
+dotnet_naming_rule.interface_types_must_be_prefixed_with_I.severity = warning
+dotnet_naming_rule.interface_types_must_be_prefixed_with_I.symbols = interface_type_symbol
+dotnet_naming_rule.interface_types_must_be_prefixed_with_I.style = interface_type_style
+
+dotnet_naming_symbols.member_symbol.applicable_kinds = method,property,event
+dotnet_naming_style.member_style.capitalization = pascal_case
+dotnet_naming_rule.members_are_pascal_case.severity = warning
+dotnet_naming_rule.members_are_pascal_case.symbols = member_symbol
+dotnet_naming_rule.members_are_pascal_case.style = member_style

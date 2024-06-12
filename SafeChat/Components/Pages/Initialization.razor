@@ -20,8 +20,5 @@
     string ip = "127.0.0.1";
     int port = 5000;
 
-    async Task StartConnection(string role)
-    {
-        NavigationManager.NavigateTo($"/chat?role={role}&ip={ip}&port={port}");
-    }
+    async Task StartConnection(string role) => await Task.Run(() => NavigationManager.NavigateTo($"/chat?role={role}&ip={ip}&port={port}"));
 }

@@ -56,12 +56,12 @@
             {
                 await SocketService.StartConnection(role, ip, int.Parse(port));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 GoBack();
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             GoBack();
         }
@@ -100,7 +100,7 @@
     {
         if (e.Key == "Enter" || e.Key == "NumpadEnter")
         {
-            SendMessage();
+            _ = SendMessage();
         }
     }
 
@@ -120,7 +120,7 @@
 
     public class ChatMessage
     {
-        public string Content { get; set; }
+        public string? Content { get; set; }
         public bool SentByMe { get; set; }
     }
 }
