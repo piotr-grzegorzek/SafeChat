@@ -2,15 +2,14 @@ using System.Net.Sockets;
 
 namespace SafeChat
 {
-    public abstract class ConnectionService
+    public abstract class SocketService
     {
         public abstract event Action? ConnectionEstablished;
         public abstract event Action? ConnectionClosed;
-
-        public NetworkStream? Stream { get; protected set; }
-        public CancellationTokenSource? CancellationTokenSource { get; protected set; } = new CancellationTokenSource();
+        public abstract event Action<string>? MessageReceived;
 
         public abstract Task StartConnection(string role, string host, int port);
+        public abstract Task SendMessage(string message);
         public abstract void Stop();
     }
 }

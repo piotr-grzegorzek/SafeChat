@@ -25,8 +25,7 @@ namespace SafeChat
                 System.Diagnostics.Debug.WriteLine("********** OMG! FirstChanceException **********");
                 System.Diagnostics.Debug.WriteLine(e.Exception);
             };
-            builder.Services.AddSingleton<ConnectionService, GenericConnectionService>();
-            builder.Services.AddSingleton<MessageService, SecureMessageService>();
+            builder.Services.AddSingleton<SocketService, GenericSocketService>();
 
             return builder.Build();
         }

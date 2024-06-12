@@ -1,8 +1,7 @@
 ﻿@page "/chat"
 @using System.Web
 @inject NavigationManager NavigationManager
-@inject ConnectionService ConnectionService
-@inject MessageService MessageService
+@inject SocketService SocketService
 
 <div class="container-fluid chat-container">
     <div class="@(isConnected ? "chat-header-connected" : "chat-header-awaiting")">
@@ -49,13 +48,13 @@
                 throw new ArgumentException("Role, IP, or port is missing in the query parameters.");
             }
 
-            ConnectionService.ConnectionEstablished += OnConnectionEstablished;
-            ConnectionService.ConnectionClosed += OnConnectionClosed;
-            MessageService.MessageReceived += OnMessageReceived;
+            SocketService.ConnectionEstablished += OnConnectionEstablished;
+            SocketService.ConnectionClosed += OnConnectionClosed;
+            SocketService.MessageReceived += OnMessageReceived;
 
             try
             {
-                await ConnectionService.StartConnection(role, ip, int.Parse(port));
+                await SocketService.StartConnection(role, ip, int.Parse(port));
             }
             catch (Exception ex)
             {
@@ -71,8 +70,6 @@
     private void OnConnectionEstablished()
     {
         isConnected = true;
-        MessageService.PassConnectionParams(ConnectionService.Stream, ConnectionService.CancellationTokenSource);
-        MessageService.StartReceivingMessages();
         InvokeAsync(StateHasChanged);
     }
 
@@ -92,7 +89,7 @@
     {
         if (!string.IsNullOrWhiteSpace(message))
         {
-            await MessageService.SendMessage(message);
+            await SocketService.SendMessage(message);
             messages.Add(new ChatMessage { Content = message, SentByMe = true });
             message = string.Empty;
             await InvokeAsync(StateHasChanged);
@@ -115,10 +112,10 @@
 
     public void Dispose()
     {
-        ConnectionService.ConnectionEstablished -= OnConnectionEstablished;
-        ConnectionService.ConnectionClosed -= OnConnectionClosed;
-        MessageService.MessageReceived -= OnMessageReceived;
-        ConnectionService.Stop();
+        SocketService.ConnectionEstablished -= OnConnectionEstablished;
+        SocketService.ConnectionClosed -= OnConnectionClosed;
+        SocketService.MessageReceived -= OnMessageReceived;
+        SocketService.Stop();
     }
 
     public class ChatMessage
