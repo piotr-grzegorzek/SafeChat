@@ -62,7 +62,7 @@ namespace SafeChat
             {
                 try
                 {
-                    int bytesRead = await _stream!.ReadAsync(buffer, 0, buffer.Length, token);
+                    int bytesRead = await _stream!.ReadAsync(buffer.AsMemory(0, buffer.Length), token);
                     if (bytesRead > 0)
                     {
                         string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
@@ -90,7 +90,7 @@ namespace SafeChat
             if (_stream != null && _stream.CanWrite)
             {
                 byte[] data = Encoding.UTF8.GetBytes(message);
-                await _stream.WriteAsync(data, 0, data.Length);
+                await _stream.WriteAsync(data.AsMemory(0, data.Length));
             }
         }
 

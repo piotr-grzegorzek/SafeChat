@@ -1,5 +1,3 @@
-using System.Net.Sockets;
-
 namespace SafeChat
 {
     public abstract class SocketService
