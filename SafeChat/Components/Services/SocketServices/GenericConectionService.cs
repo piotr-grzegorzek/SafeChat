@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace SafeChat
 {
@@ -49,7 +50,12 @@ namespace SafeChat
         {
             try
             {
-                CancellationTokenSource.Cancel();
+                if (Stream != null && Stream.CanWrite)
+                {
+                    byte[] data = Encoding.UTF8.GetBytes("Connection closed.");
+                    Stream.Write(data, 0, data.Length);
+                }
+                CancellationTokenSource?.Cancel();
                 Stream?.Close();
                 _client?.Close();
                 _server?.Stop();

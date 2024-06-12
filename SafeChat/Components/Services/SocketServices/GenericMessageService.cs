@@ -10,7 +10,7 @@ namespace SafeChat
         {
             byte[] buffer = new byte[1024];
 
-            while (Stream != null && !CancellationTokenSource.Token.IsCancellationRequested)
+            while (!CancellationTokenSource.Token.IsCancellationRequested)
             {
                 try
                 {
@@ -36,7 +36,6 @@ namespace SafeChat
         {
             if (Stream != null && Stream.CanWrite)
             {
-                System.Diagnostics.Debug.WriteLine($"Sending message: {message}");
                 byte[] data = Encoding.UTF8.GetBytes(message);
                 await Stream.WriteAsync(data, 0, data.Length);
             }
