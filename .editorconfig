@@ -329,6 +329,7 @@ dotnet_diagnostic.CA1835.severity = warning
 dotnet_diagnostic.IDE0290.severity = none
 dotnet_diagnostic.IDE2000.severity = warning
 dotnet_diagnostic.IDE2002.severity = warning
+dotnet_diagnostic.IDE0021.severity = none
 
 #UNT0001: Unity messages are called by the runtime even if they're empty. Remove them to avoid unnecessary processing.
 dotnet_diagnostic.UNT0001.severity = warning
