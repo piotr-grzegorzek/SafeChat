@@ -1,7 +1,7 @@
 ﻿
 namespace SafeChat
 {
-    public class CustomKeyExchangeService : KeyExchangeService
+    public class KeyExchangeServiceRSA : KeyExchangeService
     {
         public override Task<string> DecryptSessionKey(string encryptedSessionKey) => throw new NotImplementedException();
         public override Task<string> EncryptSessionKey(string sessionKey) => throw new NotImplementedException();

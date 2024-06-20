@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SafeChat
 {
-    public class GenericSocketService : SocketService
+    public class SocketServiceGeneric : SocketService
     {
         public override event Action? ConnectionEstablished;
         public override event Action? ConnectionClosed;

@@ -30,7 +30,7 @@
     string? ip;
     string? port;
     bool isConnected = false;
-    SocketService socketService;
+    SocketService? socketService;
 
     List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -48,7 +48,7 @@
                 throw new ArgumentException("Role, IP, or port is missing in the query parameters.");
             }
 
-            socketService = new SecureSocketServiceDecorator(new GenericSocketService());
+            socketService = new SocketServiceSecurityDecorator(new SocketServiceGeneric());
             socketService.ConnectionEstablished += OnConnectionEstablished;
             socketService.ConnectionClosed += OnConnectionClosed;
             socketService.MessageReceived += OnMessageReceived;

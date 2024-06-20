@@ -1,6 +1,6 @@
 namespace SafeChat
 {
-    public class CustomEncryptionService : EncryptionService
+    public class EncryptionServiceAES : EncryptionService
     {
         public override string Encrypt(string data, string key) => throw new NotImplementedException();
 
