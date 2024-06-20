@@ -48,7 +48,7 @@
                 throw new ArgumentException("Role, IP, or port is missing in the query parameters.");
             }
 
-            socketService = new SocketServiceSecurityDecorator(new SocketServiceGeneric());
+            socketService = new SocketService();
             socketService.ConnectionEstablished += OnConnectionEstablished;
             socketService.ConnectionClosed += OnConnectionClosed;
             socketService.MessageReceived += OnMessageReceived;
