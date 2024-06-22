@@ -161,6 +161,12 @@ namespace SafeChat
                     break;
                 }
             }
+
+            if (!_isStopping)
+            {
+                MessageReceived?.Invoke("Connection closed.");
+                ConnectionClosed?.Invoke();
+            }
         }
 
         public override async Task SendMessage(string message, bool encrypt = true)
