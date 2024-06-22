@@ -43,7 +43,6 @@
             role = HttpUtility.ParseQueryString(uri.Query).Get("role");
             ip = HttpUtility.ParseQueryString(uri.Query).Get("ip");
             port = HttpUtility.ParseQueryString(uri.Query).Get("port");
-
             if (role == null || ip == null || port == null)
             {
                 throw new ArgumentException("Role, IP, or port is missing in the query parameters.");
@@ -63,14 +62,7 @@
             socketService.ConnectionClosed += OnConnectionClosed;
             socketService.MessageReceived += OnMessageReceived;
 
-            try
-            {
-                await socketService.StartConnection(role, ip, int.Parse(port));
-            }
-            catch (Exception)
-            {
-                GoBack();
-            }
+            await socketService.StartConnection(role, ip, int.Parse(port));
         }
         catch (Exception)
         {
@@ -100,7 +92,12 @@
     {
         if (!string.IsNullOrWhiteSpace(message))
         {
+            if (socketService == null)
+            {
+                return;
+            }
             await socketService.SendMessage(message);
+
             messages.Add(new ChatMessage { Content = message, SentByMe = true });
             message = string.Empty;
             await InvokeAsync(StateHasChanged);
@@ -123,15 +120,14 @@
 
     public void Dispose()
     {
+        if (socketService == null)
+        {
+            return;
+        }
+
         socketService.ConnectionEstablished -= OnConnectionEstablished;
         socketService.ConnectionClosed -= OnConnectionClosed;
         socketService.MessageReceived -= OnMessageReceived;
         socketService.Stop();
-    }
-
-    public class ChatMessage
-    {
-        public string? Content { get; set; }
-        public bool SentByMe { get; set; }
     }
 }
