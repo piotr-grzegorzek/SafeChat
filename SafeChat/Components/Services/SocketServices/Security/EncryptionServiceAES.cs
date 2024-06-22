@@ -2,9 +2,9 @@ using System.Security.Cryptography;
 
 namespace SafeChat
 {
-    public class EncryptionServiceAES
+    public static class EncryptionServiceAES
     {
-        public string GenerateSessionKey()
+        public static string GenerateSessionKey()
         {
             using (Aes aes = Aes.Create())
             {
@@ -13,13 +13,8 @@ namespace SafeChat
             }
         }
 
-        public string Encrypt(string data, string key)
+        public static string Encrypt(string data, string key)
         {
-            if (string.IsNullOrEmpty(data) || string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException("Data and key cannot be null or empty.");
-            }
-
             using (Aes aes = Aes.Create())
             {
                 aes.Key = Convert.FromBase64String(key);
@@ -39,13 +34,8 @@ namespace SafeChat
             }
         }
 
-        public string Decrypt(string data, string key)
+        public static string Decrypt(string data, string key)
         {
-            if (string.IsNullOrEmpty(data) || string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException("Data and key cannot be null or empty.");
-            }
-
             byte[] buffer = Convert.FromBase64String(data);
             using (Aes aes = Aes.Create())
             {

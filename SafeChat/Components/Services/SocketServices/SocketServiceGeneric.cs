@@ -17,7 +17,6 @@ namespace SafeChat
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private bool _isStopping = false;
 
-        private readonly EncryptionServiceAES _encryptionService = new EncryptionServiceAES();
         RSAParameters _privateKey;
 
         RSAParameters _publicKey;
@@ -100,7 +99,7 @@ namespace SafeChat
             byte[] data;
             if (encrypt)
             {
-                string encryptedMessage = _encryptionService.Encrypt(message, _sessionKey!);
+                string encryptedMessage = EncryptionServiceAES.Encrypt(message, _sessionKey!);
                 data = Encoding.UTF8.GetBytes(encryptedMessage);
             }
             else
@@ -170,7 +169,7 @@ namespace SafeChat
             }
         }
 
-        private string BeforeNormalMessageReceivedInvoke(string message) => _encryptionService.Decrypt(message, _sessionKey!);
+        private string BeforeNormalMessageReceivedInvoke(string message) => EncryptionServiceAES.Decrypt(message, _sessionKey!);
 
         private async void PerformKeyExchangeAsServer()
         {
@@ -204,7 +203,7 @@ namespace SafeChat
             await SendMessage(GetPublicKey(), false);  //1  
             SetRemotePublicKey(ReceiveMessage());  //4
 
-            _sessionKey = _encryptionService.GenerateSessionKey();
+            _sessionKey = EncryptionServiceAES.GenerateSessionKey();
             System.Diagnostics.Debug.WriteLine("********** Unencrypted session key **********");
             System.Diagnostics.Debug.WriteLine(_sessionKey);
 
@@ -283,7 +282,7 @@ namespace SafeChat
             return Encoding.UTF8.GetString(buffer, 0, bytesRead);
         }
 
-        private string CalculateHash(string data)
+        private static string CalculateHash(string data)
         {
             byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(data));
             return Convert.ToBase64String(hashBytes);
