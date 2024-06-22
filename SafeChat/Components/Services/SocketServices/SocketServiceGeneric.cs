@@ -1,34 +1,22 @@
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace SafeChat
 {
-    public class SocketService
+    public class SocketServiceGeneric : SocketService
     {
-        public event Action? ConnectionEstablished;
-        public event Action? ConnectionClosed;
-        public event Action<string>? MessageReceived;
+        public override event Action? ConnectionEstablished;
+        public override event Action? ConnectionClosed;
+        public override event Action<string>? MessageReceived;
 
         private TcpListener? _server;
         private TcpClient? _client;
         private NetworkStream? _stream;
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private bool _isStopping = false;
 
-        private readonly KeyExchangeServiceRSA _keyExchangeService = new KeyExchangeServiceRSA();
-        private readonly EncryptionServiceAES _encryptionService = new EncryptionServiceAES();
-        private readonly SignatureServiceRSA _signatureService;
-        private string? _sessionKey;
-
-        public SocketService()
-        {
-            _keyExchangeService.GenerateKeyPairs().Wait();
-            _signatureService = new SignatureServiceRSA(_keyExchangeService.PrivateKey, _keyExchangeService.PublicKey);
-        }
-
-        public async Task StartConnection(string role, string host, int port)
+        public override async Task StartConnection(string role, string host, int port)
         {
             if (role == "server")
             {
@@ -40,7 +28,6 @@ namespace SafeChat
                     _client = await _server.AcceptTcpClientAsync();
                     _stream = _client.GetStream();
                     ConnectionEstablished?.Invoke();
-                    await HandleKeyExchange();
                     _ = Task.Run(() => StartReceivingMessages(_cancellationTokenSource.Token));
                 }
                 catch (Exception)
@@ -57,7 +44,6 @@ namespace SafeChat
                     await _client.ConnectAsync(host, port);
                     _stream = _client.GetStream();
                     ConnectionEstablished?.Invoke();
-                    await HandleKeyExchange();
                     _ = Task.Run(() => StartReceivingMessages(_cancellationTokenSource.Token));
                 }
                 catch (Exception)
@@ -66,55 +52,6 @@ namespace SafeChat
                     throw;
                 }
             }
-        }
-
-        private async Task HandleKeyExchange()
-        {
-            string role = _server != null ? "server" : "client";
-
-            if (role == "client")
-            {
-                string publicKey = await _keyExchangeService.GetPublicKey();
-                await SendMessage(publicKey);
-                string serverPublicKey = await ReceiveMessage();
-                await _keyExchangeService.SetRemotePublicKey(serverPublicKey);
-
-                _sessionKey = await KeyExchangeServiceRSA.GenerateSessionKey();
-                string encryptedSessionKey = await _keyExchangeService.EncryptSessionKey(_sessionKey);
-                string sessionKeyHash = ComputeHash(_sessionKey);
-                string sessionKeySignature = _signatureService.SignData(_sessionKey);
-
-                await SendMessage($"{encryptedSessionKey}.{sessionKeyHash}.{sessionKeySignature}");
-            }
-            else if (role == "server")
-            {
-                string clientPublicKey = await ReceiveMessage();
-                await _keyExchangeService.SetRemotePublicKey(clientPublicKey);
-
-                string serverPublicKey = await _keyExchangeService.GetPublicKey();
-                await SendMessage(serverPublicKey);
-
-                string[] sessionKeyParts = (await ReceiveMessage()).Split('.');
-                string encryptedSessionKey = sessionKeyParts[0];
-                string sessionKeyHash = sessionKeyParts[1];
-                string sessionKeySignature = sessionKeyParts[2];
-
-                string decryptedSessionKey = await _keyExchangeService.DecryptSessionKey(encryptedSessionKey);
-
-                if (ComputeHash(decryptedSessionKey) != sessionKeyHash ||
-                    !_signatureService.VerifySignature(decryptedSessionKey, sessionKeySignature))
-                {
-                    throw new Exception("Session key verification failed.");
-                }
-
-                _sessionKey = decryptedSessionKey;
-            }
-        }
-
-        private static string ComputeHash(string data)
-        {
-            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(data));
-            return Convert.ToBase64String(hash);
         }
 
         private async Task StartReceivingMessages(CancellationToken token)
@@ -129,8 +66,7 @@ namespace SafeChat
                     if (bytesRead > 0)
                     {
                         string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                        string decryptedMessage = EncryptionServiceAES.Decrypt(message, _sessionKey);
-                        MessageReceived?.Invoke(decryptedMessage);
+                        MessageReceived?.Invoke(message);
                     }
                     else
                     {
@@ -149,26 +85,48 @@ namespace SafeChat
             }
         }
 
-        public async Task SendMessage(string message)
+        public override async Task SendMessage(string message)
         {
             if (_stream != null && _stream.CanWrite)
             {
-                string encryptedMessage = EncryptionServiceAES.Encrypt(message, _sessionKey);
-                byte[] data = Encoding.UTF8.GetBytes(encryptedMessage);
-                await _stream.WriteAsync(data);
+                byte[] data = Encoding.UTF8.GetBytes(message);
+                await _stream.WriteAsync(data.AsMemory(0, data.Length));
             }
         }
 
-        public void Stop()
+        public override void Stop()
         {
-            _isStopping = true;
-            _cancellationTokenSource.Cancel();
+            try
+            {
+                _isStopping = true;
+                _cancellationTokenSource.Cancel();
+                if (_stream != null && _stream.CanWrite)
+                {
+                    byte[] data = Encoding.UTF8.GetBytes("Connection closed.");
+                    _stream.Write(data, 0, data.Length);
+                }
+                _stream?.Close();
+                _client?.Close();
+                _server?.Stop();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error stopping the service: {ex.Message}");
+            }
+            finally
+            {
+                Reset();
+                ConnectionClosed?.Invoke();
+            }
+        }
 
-            _stream?.Close();
-            _client?.Close();
-            _server?.Stop();
-
-            ConnectionClosed?.Invoke();
+        private void Reset()
+        {
+            _server = null;
+            _client = null;
+            _stream = null;
+            _isStopping = false;
+            _cancellationTokenSource = new CancellationTokenSource();
         }
     }
 }
