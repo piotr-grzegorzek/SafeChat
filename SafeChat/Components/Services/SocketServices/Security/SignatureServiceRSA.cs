@@ -3,7 +3,7 @@ using System.Text;
 
 namespace SafeChat
 {
-    public class SignatureServiceRSA : SignatureService
+    public class SignatureServiceRSA
     {
         private readonly RSAParameters _privateKey;
         private RSAParameters _remotePublicKey;
@@ -13,7 +13,7 @@ namespace SafeChat
             _privateKey = privateKey;
         }
 
-        public override string SignData(string data)
+        public string SignData(string data)
         {
             using (RSA rsa = RSA.Create())
             {
@@ -24,7 +24,7 @@ namespace SafeChat
             }
         }
 
-        public override bool VerifySignature(string data, string signature)
+        public bool VerifySignature(string data, string signature)
         {
             using (RSA rsa = RSA.Create())
             {
@@ -35,7 +35,7 @@ namespace SafeChat
             }
         }
 
-        public Task SetRemotePublicKey(string publicKey)
+        public void SetRemotePublicKey(string publicKey)
         {
             if (string.IsNullOrEmpty(publicKey))
             {
@@ -47,7 +47,6 @@ namespace SafeChat
                 rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
                 _remotePublicKey = rsa.ExportParameters(false);
             }
-            return Task.CompletedTask;
         }
     }
 }

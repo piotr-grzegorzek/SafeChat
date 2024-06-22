@@ -3,7 +3,7 @@ using System.Text;
 
 namespace SafeChat
 {
-    public class KeyExchangeServiceRSA : KeyExchangeService
+    public class KeyExchangeServiceRSA
     {
         private readonly RSAParameters _privateKey;
         private readonly RSAParameters _publicKey;
@@ -15,16 +15,16 @@ namespace SafeChat
             _publicKey = publicKey;
         }
 
-        public override Task<string> GetPublicKey()
+        public string GetPublicKey()
         {
             using (RSA rsa = RSA.Create())
             {
                 rsa.ImportParameters(_publicKey);
-                return Task.FromResult(Convert.ToBase64String(rsa.ExportRSAPublicKey()));
+                return Convert.ToBase64String(rsa.ExportRSAPublicKey());
             }
         }
 
-        public override Task SetRemotePublicKey(string publicKey)
+        public void SetRemotePublicKey(string publicKey)
         {
             if (string.IsNullOrEmpty(publicKey))
             {
@@ -36,26 +36,25 @@ namespace SafeChat
                 rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
                 _remotePublicKey = rsa.ExportParameters(false);
             }
-            return Task.CompletedTask;
         }
 
-        public override Task<string> EncryptSessionKey(string sessionKey)
+        public string EncryptSessionKey(string sessionKey)
         {
             using (RSA rsa = RSA.Create())
             {
                 rsa.ImportParameters(_remotePublicKey);
                 byte[] encryptedKey = rsa.Encrypt(Encoding.UTF8.GetBytes(sessionKey), RSAEncryptionPadding.OaepSHA256);
-                return Task.FromResult(Convert.ToBase64String(encryptedKey));
+                return Convert.ToBase64String(encryptedKey);
             }
         }
 
-        public override Task<string> DecryptSessionKey(string encryptedSessionKey)
+        public string DecryptSessionKey(string encryptedSessionKey)
         {
             using (RSA rsa = RSA.Create())
             {
                 rsa.ImportParameters(_privateKey);
                 byte[] decryptedKey = rsa.Decrypt(Convert.FromBase64String(encryptedSessionKey), RSAEncryptionPadding.OaepSHA256);
-                return Task.FromResult(Encoding.UTF8.GetString(decryptedKey));
+                return Encoding.UTF8.GetString(decryptedKey);
             }
         }
     }

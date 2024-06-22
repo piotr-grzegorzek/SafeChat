@@ -5,11 +5,11 @@ using System.Text;
 
 namespace SafeChat
 {
-    public class SocketServiceGeneric : SocketService
+    public class SocketServiceGeneric
     {
-        public override event Action? ConnectionEstablished;
-        public override event Action? ConnectionClosed;
-        public override event Action<string>? MessageReceived;
+        public event Action? ConnectionEstablished;
+        public event Action? ConnectionClosed;
+        public event Action<string>? MessageReceived;
 
         private TcpListener? _server;
         private TcpClient? _client;
@@ -28,7 +28,7 @@ namespace SafeChat
             _signatureService = new SignatureServiceRSA(privateKey);
         }
 
-        public override async Task StartConnection(string role, string host, int port)
+        public async Task StartConnection(string role, string host, int port)
         {
             if (role == "server")
             {
@@ -39,7 +39,7 @@ namespace SafeChat
                 {
                     _client = await _server.AcceptTcpClientAsync();
                     _stream = _client.GetStream();
-                    await PerformKeyExchangeAsServer();
+                    PerformKeyExchangeAsServer();
                     ConnectionEstablished?.Invoke();
                     _ = Task.Run(() => StartReceivingMessages(_cancellationTokenSource.Token));
                 }
@@ -56,7 +56,7 @@ namespace SafeChat
                 {
                     await _client.ConnectAsync(host, port);
                     _stream = _client.GetStream();
-                    await PerformKeyExchangeAsClient();
+                    PerformKeyExchangeAsClient();
                     ConnectionEstablished?.Invoke();
                     _ = Task.Run(() => StartReceivingMessages(_cancellationTokenSource.Token));
                 }
@@ -68,22 +68,22 @@ namespace SafeChat
             }
         }
 
-        private async Task PerformKeyExchangeAsServer()
+        private async void PerformKeyExchangeAsServer()
         {
-            string clientPublicKey = await ReceiveMessage();    // 2
-            await _keyExchangeService.SetRemotePublicKey(clientPublicKey);
-            await _signatureService.SetRemotePublicKey(clientPublicKey);
-            string serverPublicKey = await _keyExchangeService.GetPublicKey();
+            string clientPublicKey = ReceiveMessage();    // 2
+            _keyExchangeService.SetRemotePublicKey(clientPublicKey);
+            _signatureService.SetRemotePublicKey(clientPublicKey);
+            string serverPublicKey = _keyExchangeService.GetPublicKey();
             await SendMessage(serverPublicKey, false);  // 3
 
-            string encryptedSessionKey = await ReceiveMessage();    //6
+            string encryptedSessionKey = ReceiveMessage();    //6
             await SendMessage("session key recv", false);
-            string sessionKeyHash = await ReceiveMessage(); //8
+            string sessionKeyHash = ReceiveMessage(); //8
             await SendMessage("hash recv", false);
-            string sessionKeySignature = await ReceiveMessage();    //10
+            string sessionKeySignature = ReceiveMessage();    //10
             await SendMessage("signature recv", false);
 
-            _sessionKey = await _keyExchangeService.DecryptSessionKey(encryptedSessionKey);
+            _sessionKey = _keyExchangeService.DecryptSessionKey(encryptedSessionKey);
             string calculatedHash = CalculateHash(_sessionKey);
 
             //11
@@ -98,33 +98,33 @@ namespace SafeChat
             }
         }
 
-        private async Task PerformKeyExchangeAsClient()
+        private async void PerformKeyExchangeAsClient()
         {
-            string clientPublicKey = await _keyExchangeService.GetPublicKey();
+            string clientPublicKey = _keyExchangeService.GetPublicKey();
             await SendMessage(clientPublicKey, false);  //1
-            string serverPublicKey = await ReceiveMessage();    //4
-            await _keyExchangeService.SetRemotePublicKey(serverPublicKey);
-            await _signatureService.SetRemotePublicKey(clientPublicKey);
+            string serverPublicKey = ReceiveMessage();    //4
+            _keyExchangeService.SetRemotePublicKey(serverPublicKey);
+            _signatureService.SetRemotePublicKey(clientPublicKey);
 
-            _sessionKey = await _encryptionService.GenerateSessionKey();
+            _sessionKey = _encryptionService.GenerateSessionKey();
             System.Diagnostics.Debug.WriteLine("********** Unencrypted session key **********");
             System.Diagnostics.Debug.WriteLine(_sessionKey);
-            string encryptedSessionKey = await _keyExchangeService.EncryptSessionKey(_sessionKey);
+            string encryptedSessionKey = _keyExchangeService.EncryptSessionKey(_sessionKey);
             System.Diagnostics.Debug.WriteLine("********** Encrypted session key **********");
             System.Diagnostics.Debug.WriteLine(encryptedSessionKey);
             string sessionKeyHash = CalculateHash(_sessionKey);
             string sessionKeySignature = _signatureService.SignData(_sessionKey);
 
             await SendMessage(encryptedSessionKey, false);  //5
-            if (await ReceiveMessage() == "session key recv")
+            if (ReceiveMessage() == "session key recv")
             {
                 await SendMessage(sessionKeyHash, false);   //7
-                if (await ReceiveMessage() == "hash recv")
+                if (ReceiveMessage() == "hash recv")
                 {
                     await SendMessage(sessionKeySignature, false);  //9
-                    if (await ReceiveMessage() == "signature recv")
+                    if (ReceiveMessage() == "signature recv")
                     {
-                        string serverResponse = await ReceiveMessage(); // 12
+                        string serverResponse = ReceiveMessage(); // 12
                         if (serverResponse != "OK")
                         {
                             throw new InvalidOperationException("Server response is not OK.");
@@ -140,7 +140,7 @@ namespace SafeChat
             return Convert.ToBase64String(hashBytes);
         }
 
-        private async Task StartReceivingMessages(CancellationToken token)
+        private async void StartReceivingMessages(CancellationToken token)
         {
             byte[] buffer = new byte[1024];
 
@@ -175,7 +175,7 @@ namespace SafeChat
             }
         }
 
-        public override async Task SendMessage(string message, bool encrypt = true)
+        public async Task SendMessage(string message, bool encrypt = true)
         {
             if (_stream == null)
             {
@@ -194,7 +194,7 @@ namespace SafeChat
             await _stream.WriteAsync(data);
         }
 
-        public override void Stop()
+        public void Stop()
         {
             _isStopping = true;
             _cancellationTokenSource.Cancel();
@@ -207,10 +207,10 @@ namespace SafeChat
             ConnectionClosed?.Invoke();
         }
 
-        private async Task<string> ReceiveMessage()
+        private string ReceiveMessage()
         {
             byte[] buffer = new byte[1024];
-            int bytesRead = await _stream!.ReadAsync(buffer.AsMemory(0, buffer.Length));
+            int bytesRead = _stream!.Read(buffer, 0, buffer.Length);
             return Encoding.UTF8.GetString(buffer, 0, bytesRead);
         }
     }

@@ -2,18 +2,18 @@ using System.Security.Cryptography;
 
 namespace SafeChat
 {
-    public class EncryptionServiceAES : EncryptionService
+    public class EncryptionServiceAES
     {
-        public override Task<string> GenerateSessionKey()
+        public string GenerateSessionKey()
         {
             using (Aes aes = Aes.Create())
             {
                 aes.GenerateKey();
-                return Task.FromResult(Convert.ToBase64String(aes.Key));
+                return Convert.ToBase64String(aes.Key);
             }
         }
 
-        public override string Encrypt(string data, string key)
+        public string Encrypt(string data, string key)
         {
             if (string.IsNullOrEmpty(data) || string.IsNullOrEmpty(key))
             {
@@ -39,7 +39,7 @@ namespace SafeChat
             }
         }
 
-        public override string Decrypt(string data, string key)
+        public string Decrypt(string data, string key)
         {
             if (string.IsNullOrEmpty(data) || string.IsNullOrEmpty(key))
             {

@@ -31,7 +31,7 @@
     string? ip;
     string? port;
     bool isConnected = false;
-    SocketService? socketService;
+    SocketServiceGeneric? socketService;
 
     List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -91,7 +91,7 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private async Task SendMessage()
+    private async void SendMessage()
     {
         if (!string.IsNullOrWhiteSpace(message))
         {
@@ -106,7 +106,7 @@
     {
         if (e.Key == "Enter" || e.Key == "NumpadEnter")
         {
-            _ = SendMessage();
+            SendMessage();
         }
     }
 
