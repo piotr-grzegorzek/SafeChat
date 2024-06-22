@@ -31,7 +31,7 @@
     string? ip;
     string? port;
     bool isConnected = false;
-    SocketServiceGeneric? socketService;
+    SocketService? socketService;
 
     List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -57,7 +57,7 @@
                 publicKey = rsa.ExportParameters(false);
             }
 
-            socketService = new SocketServiceGeneric(privateKey, publicKey);
+            socketService = new SocketServiceSecurityDecorator(new SocketServiceGeneric(), privateKey, publicKey);
             socketService.ConnectionEstablished += OnConnectionEstablished;
             socketService.MessageReceived += OnMessageReceived;
             socketService.ConnectionClosed += OnConnectionClosed;
