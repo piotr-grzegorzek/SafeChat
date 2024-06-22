@@ -49,9 +49,14 @@
                 throw new ArgumentException("Role, IP, or port is missing in the query parameters.");
             }
 
-            var keyPairs = RSAKeyGenerator.GenerateKeyPairs();
-            RSAParameters privateKey = keyPairs.privateKey;
-            RSAParameters publicKey = keyPairs.publicKey;
+            RSAParameters privateKey;
+            RSAParameters publicKey;
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.KeySize = 2048;
+                privateKey = rsa.ExportParameters(true);
+                publicKey = rsa.ExportParameters(false);
+            }
 
             socketService = new SocketServiceGeneric(privateKey, publicKey);
             socketService.ConnectionEstablished += OnConnectionEstablished;
@@ -128,19 +133,5 @@
     {
         public string? Content { get; set; }
         public bool SentByMe { get; set; }
-    }
-
-    public static class RSAKeyGenerator
-    {
-        public static (RSAParameters privateKey, RSAParameters publicKey) GenerateKeyPairs()
-        {
-            using (RSA rsa = RSA.Create())
-            {
-                rsa.KeySize = 2048;
-                RSAParameters privateKey = rsa.ExportParameters(true);
-                RSAParameters publicKey = rsa.ExportParameters(false);
-                return (privateKey, publicKey);
-            }
-        }
     }
 }
