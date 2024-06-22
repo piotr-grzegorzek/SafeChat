@@ -7,7 +7,7 @@ namespace SafeChat
         public abstract event Action<string>? MessageReceived;
 
         public abstract Task StartConnection(string role, string host, int port);
-        public abstract Task SendMessage(string message);
+        public abstract Task SendMessage(string message, bool encrypt = true);
         public abstract void Stop();
     }
 }
