@@ -14,7 +14,7 @@ namespace SafeChat
         private TcpListener? _server;
         private TcpClient? _client;
         private NetworkStream? _stream;
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private bool _isStopping = false;
 
         private readonly KeyExchangeServiceRSA _keyExchangeService;
@@ -203,6 +203,7 @@ namespace SafeChat
             _client?.Close();
             _server?.Stop();
 
+            MessageReceived?.Invoke("Connection closed.");
             ConnectionClosed?.Invoke();
         }
 

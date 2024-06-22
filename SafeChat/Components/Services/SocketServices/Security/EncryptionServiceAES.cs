@@ -24,12 +24,10 @@ namespace SafeChat
             {
                 aes.Key = Convert.FromBase64String(key);
                 aes.GenerateIV();
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
                 using (MemoryStream ms = new MemoryStream())
                 {
                     ms.Write(aes.IV, 0, aes.IV.Length);
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
                     {
                         using (StreamWriter sw = new StreamWriter(cs))
                         {
@@ -52,14 +50,10 @@ namespace SafeChat
             using (Aes aes = Aes.Create())
             {
                 aes.Key = Convert.FromBase64String(key);
-                byte[] iv = new byte[aes.BlockSize / 8];
-                Array.Copy(buffer, 0, iv, 0, iv.Length);
-                aes.IV = iv;
-                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-                using (MemoryStream ms = new MemoryStream(buffer, iv.Length, buffer.Length - iv.Length))
+                aes.IV = buffer.Take(aes.BlockSize / 8).ToArray();
+                using (MemoryStream ms = new MemoryStream(buffer.Skip(aes.BlockSize / 8).ToArray()))
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read))
                     {
                         using (StreamReader sr = new StreamReader(cs))
                         {

@@ -5,8 +5,8 @@ namespace SafeChat
 {
     public class KeyExchangeServiceRSA : KeyExchangeService
     {
-        private RSAParameters _privateKey;
-        private RSAParameters _publicKey;
+        private readonly RSAParameters _privateKey;
+        private readonly RSAParameters _publicKey;
         private RSAParameters _remotePublicKey;
 
         public KeyExchangeServiceRSA(RSAParameters privateKey, RSAParameters publicKey)
@@ -30,19 +30,13 @@ namespace SafeChat
             {
                 throw new ArgumentNullException(nameof(publicKey), "Public key cannot be null or empty.");
             }
-            try
+
+            using (RSA rsa = RSA.Create())
             {
-                using (RSA rsa = RSA.Create())
-                {
-                    rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
-                    _remotePublicKey = rsa.ExportParameters(false);
-                }
-                return Task.CompletedTask;
+                rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
+                _remotePublicKey = rsa.ExportParameters(false);
             }
-            catch (FormatException)
-            {
-                throw new ArgumentException("The provided public key is not a valid Base64 string.");
-            }
+            return Task.CompletedTask;
         }
 
         public override Task<string> EncryptSessionKey(string sessionKey)

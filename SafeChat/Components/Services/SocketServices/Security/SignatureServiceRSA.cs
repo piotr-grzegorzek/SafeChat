@@ -5,7 +5,7 @@ namespace SafeChat
 {
     public class SignatureServiceRSA : SignatureService
     {
-        private RSAParameters _privateKey;
+        private readonly RSAParameters _privateKey;
         private RSAParameters _remotePublicKey;
 
         public SignatureServiceRSA(RSAParameters privateKey)
@@ -41,19 +41,13 @@ namespace SafeChat
             {
                 throw new ArgumentNullException(nameof(publicKey), "Public key cannot be null or empty.");
             }
-            try
+
+            using (RSA rsa = RSA.Create())
             {
-                using (RSA rsa = RSA.Create())
-                {
-                    rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
-                    _remotePublicKey = rsa.ExportParameters(false);
-                }
-                return Task.CompletedTask;
+                rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
+                _remotePublicKey = rsa.ExportParameters(false);
             }
-            catch (FormatException)
-            {
-                throw new ArgumentException("The provided public key is not a valid Base64 string.");
-            }
+            return Task.CompletedTask;
         }
     }
 }
