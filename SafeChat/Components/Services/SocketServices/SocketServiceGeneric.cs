@@ -104,7 +104,7 @@ namespace SafeChat
             string serverPublicKey = await ReceiveMessage();    //4
             await _keyExchangeService.SetRemotePublicKey(serverPublicKey);
 
-            _sessionKey = await _keyExchangeService.GenerateSessionKey();
+            _sessionKey = await _encryptionService.GenerateSessionKey();
             string encryptedSessionKey = await _keyExchangeService.EncryptSessionKey(_sessionKey);
             string sessionKeyHash = CalculateHash(_sessionKey);
             string sessionKeySignature = _signatureService.SignData(_sessionKey);

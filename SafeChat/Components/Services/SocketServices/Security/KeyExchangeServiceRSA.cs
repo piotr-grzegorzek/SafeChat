@@ -64,14 +64,5 @@ namespace SafeChat
                 return Task.FromResult(Encoding.UTF8.GetString(decryptedKey));
             }
         }
-
-        public override Task<string> GenerateSessionKey()
-        {
-            using (Aes aes = Aes.Create())
-            {
-                aes.GenerateKey();
-                return Task.FromResult(Convert.ToBase64String(aes.Key));
-            }
-        }
     }
 }

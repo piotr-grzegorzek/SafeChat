@@ -4,6 +4,15 @@ namespace SafeChat
 {
     public class EncryptionServiceAES : EncryptionService
     {
+        public override Task<string> GenerateSessionKey()
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.GenerateKey();
+                return Task.FromResult(Convert.ToBase64String(aes.Key));
+            }
+        }
+
         public override string Encrypt(string data, string key)
         {
             if (string.IsNullOrEmpty(data) || string.IsNullOrEmpty(key))
