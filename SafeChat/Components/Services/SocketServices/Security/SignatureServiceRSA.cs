@@ -7,6 +7,14 @@ namespace SafeChat
     {
         private readonly RSAParameters _privateKey;
         private RSAParameters _remotePublicKey;
+        public void SetRemotePublicKey(string publicKey)
+        {
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
+                _remotePublicKey = rsa.ExportParameters(false);
+            }
+        }
 
         public SignatureServiceRSA(RSAParameters privateKey)
         {
@@ -32,20 +40,6 @@ namespace SafeChat
                 byte[] dataBytes = Encoding.UTF8.GetBytes(data);
                 byte[] signatureBytes = Convert.FromBase64String(signature);
                 return rsa.VerifyData(dataBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-            }
-        }
-
-        public void SetRemotePublicKey(string publicKey)
-        {
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                throw new ArgumentNullException(nameof(publicKey), "Public key cannot be null or empty.");
-            }
-
-            using (RSA rsa = RSA.Create())
-            {
-                rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
-                _remotePublicKey = rsa.ExportParameters(false);
             }
         }
     }
