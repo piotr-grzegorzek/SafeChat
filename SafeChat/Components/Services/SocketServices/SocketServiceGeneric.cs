@@ -105,7 +105,11 @@ namespace SafeChat
             await _keyExchangeService.SetRemotePublicKey(serverPublicKey);
 
             _sessionKey = await _encryptionService.GenerateSessionKey();
+            System.Diagnostics.Debug.WriteLine("********** Unencrypted session key **********");
+            System.Diagnostics.Debug.WriteLine(_sessionKey);
             string encryptedSessionKey = await _keyExchangeService.EncryptSessionKey(_sessionKey);
+            System.Diagnostics.Debug.WriteLine("********** Encrypted session key **********");
+            System.Diagnostics.Debug.WriteLine(encryptedSessionKey);
             string sessionKeyHash = CalculateHash(_sessionKey);
             string sessionKeySignature = _signatureService.SignData(_sessionKey);
 
