@@ -76,8 +76,11 @@ namespace SafeChat
             await SendMessage(serverPublicKey, false);  // 3
 
             string encryptedSessionKey = await ReceiveMessage();    //6
+            await SendMessage("session key recv", false);
             string sessionKeyHash = await ReceiveMessage(); //8
+            await SendMessage("hash recv", false);
             string sessionKeySignature = await ReceiveMessage();    //10
+            await SendMessage("signature recv", false);
 
             _sessionKey = await _keyExchangeService.DecryptSessionKey(encryptedSessionKey);
             string calculatedHash = CalculateHash(_sessionKey);
@@ -107,12 +110,21 @@ namespace SafeChat
             string sessionKeySignature = _signatureService.SignData(_sessionKey);
 
             await SendMessage(encryptedSessionKey, false);  //5
-            await SendMessage(sessionKeyHash, false);   //7
-            await SendMessage(sessionKeySignature, false);  //9
-            string serverResponse = await ReceiveMessage(); // 12
-            if (serverResponse != "OK")
+            if (await ReceiveMessage() == "session key recv")
             {
-                throw new InvalidOperationException("Server response is not OK.");
+                await SendMessage(sessionKeyHash, false);   //7
+                if (await ReceiveMessage() == "hash recv")
+                {
+                    await SendMessage(sessionKeySignature, false);  //9
+                    if (await ReceiveMessage() == "signature recv")
+                    {
+                        string serverResponse = await ReceiveMessage(); // 12
+                        if (serverResponse != "OK")
+                        {
+                            throw new InvalidOperationException("Server response is not OK.");
+                        }
+                    }
+                }
             }
         }
 
