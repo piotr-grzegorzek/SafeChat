@@ -23,51 +23,37 @@ namespace SafeChat
 
         private async void PerformKeyExchangeAsClient()
         {
-            await SendMessage(GetPublicKey(), false);  //1  
+            await SendMessage(GetPublicKey(), false);   //1
             SetRemotePublicKey(ReceiveMessage());
 
-            _sessionKey = EncryptionServiceAES.GenerateSessionKey(); //3
+            _sessionKey = EncryptionServiceAES.GenerateSessionKey();    //3
 
-            string encryptedSessionKey = EncryptSessionKey(_sessionKey); //4
-
+            string encryptedSessionKey = EncryptSessionKey(_sessionKey);    //4
             string sessionKeyHash = CalculateHash(_sessionKey); //5
             string sessionKeySignature = SignData(_sessionKey); //6
 
-            await SendMessage(encryptedSessionKey, false);  //7
-            if (ReceiveMessage() == "session key recv")
+            string keyExchangeMessage = $"{encryptedSessionKey} {sessionKeyHash} {sessionKeySignature}";
+            await SendMessage(keyExchangeMessage, false);   //7
+
+            if (ReceiveMessage() != "OK")
             {
-                await SendMessage(sessionKeyHash, false);   //7
-                if (ReceiveMessage() == "hash recv")
-                {
-                    await SendMessage(sessionKeySignature, false);  //7
-                    if (ReceiveMessage() == "signature recv")
-                    {
-                        string serverResponse = ReceiveMessage();
-                        if (serverResponse != "OK")
-                        {
-                            throw new InvalidOperationException("Server response is not OK.");
-                        }
-                    }
-                }
+                throw new InvalidOperationException("Server response is not OK.");
             }
         }
 
         private async void PerformKeyExchangeAsServer()
         {
             SetRemotePublicKey(ReceiveMessage());
-            await SendMessage(GetPublicKey(), false);  // 2
+            await SendMessage(GetPublicKey(), false);   //2
 
-            string encryptedSessionKey = ReceiveMessage();    //7
-            await SendMessage("session key recv", false);
-            string sessionKeyHash = ReceiveMessage(); //7
-            await SendMessage("hash recv", false);
-            string sessionKeySignature = ReceiveMessage();    //7
-            await SendMessage("signature recv", false);
+            string[] keyExchangeComponents = ReceiveMessage().Split(' ');
+            string encryptedSessionKey = keyExchangeComponents[0];
+            string sessionKeyHash = keyExchangeComponents[1];
+            string sessionKeySignature = keyExchangeComponents[2];
 
             _sessionKey = DecryptSessionKey(encryptedSessionKey);   //8
-            string calculatedHash = CalculateHash(_sessionKey); //9
+            string calculatedHash = CalculateHash(_sessionKey);
 
-            //11
             if (calculatedHash != sessionKeyHash || !VerifySignature(_sessionKey, sessionKeySignature)) //9, 10
             {
                 await SendMessage("NOT OK", false);
