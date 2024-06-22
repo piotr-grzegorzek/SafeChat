@@ -17,15 +17,35 @@ namespace SafeChat
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private bool _isStopping = false;
 
-        private readonly KeyExchangeServiceRSA _keyExchangeService;
-        private readonly SignatureServiceRSA _signatureService;
         private readonly EncryptionServiceAES _encryptionService = new EncryptionServiceAES();
+        RSAParameters _privateKey;
+
+        RSAParameters _publicKey;
+        public string GetPublicKey()
+        {
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportParameters(_publicKey);
+                return Convert.ToBase64String(rsa.ExportRSAPublicKey());
+            }
+        }
+
+        RSAParameters _remotePublicKey;
+        public void SetRemotePublicKey(string publicKey)
+        {
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
+                _remotePublicKey = rsa.ExportParameters(false);
+            }
+        }
+
         private string _sessionKey = string.Empty;
 
         public SocketServiceGeneric(RSAParameters privateKey, RSAParameters publicKey)
         {
-            _keyExchangeService = new KeyExchangeServiceRSA(privateKey, publicKey);
-            _signatureService = new SignatureServiceRSA(privateKey);
+            _privateKey = privateKey;
+            _publicKey = publicKey;
         }
 
         public async Task StartConnection(string role, string host, int port)
@@ -154,11 +174,8 @@ namespace SafeChat
 
         private async void PerformKeyExchangeAsServer()
         {
-            string clientPublicKey = ReceiveMessage();    // 2
-            _keyExchangeService.SetRemotePublicKey(clientPublicKey);
-            _signatureService.SetRemotePublicKey(clientPublicKey);
-            string serverPublicKey = _keyExchangeService.GetPublicKey();
-            await SendMessage(serverPublicKey, false);  // 3
+            SetRemotePublicKey(ReceiveMessage());   //2
+            await SendMessage(GetPublicKey(), false);  // 3
 
             string encryptedSessionKey = ReceiveMessage();    //6
             await SendMessage("session key recv", false);
@@ -167,11 +184,11 @@ namespace SafeChat
             string sessionKeySignature = ReceiveMessage();    //10
             await SendMessage("signature recv", false);
 
-            _sessionKey = _keyExchangeService.DecryptSessionKey(encryptedSessionKey);
+            _sessionKey = DecryptSessionKey(encryptedSessionKey);
             string calculatedHash = CalculateHash(_sessionKey);
 
             //11
-            if (calculatedHash != sessionKeyHash || !_signatureService.VerifySignature(_sessionKey, sessionKeySignature))
+            if (calculatedHash != sessionKeyHash || !VerifySignature(_sessionKey, sessionKeySignature))
             {
                 await SendMessage("NOT OK", false);
                 throw new InvalidOperationException("Session key verification failed.");
@@ -184,20 +201,19 @@ namespace SafeChat
 
         private async void PerformKeyExchangeAsClient()
         {
-            string clientPublicKey = _keyExchangeService.GetPublicKey();
-            await SendMessage(clientPublicKey, false);  //1
-            string serverPublicKey = ReceiveMessage();    //4
-            _keyExchangeService.SetRemotePublicKey(serverPublicKey);
-            _signatureService.SetRemotePublicKey(clientPublicKey);
+            await SendMessage(GetPublicKey(), false);  //1  
+            SetRemotePublicKey(ReceiveMessage());  //4
 
             _sessionKey = _encryptionService.GenerateSessionKey();
             System.Diagnostics.Debug.WriteLine("********** Unencrypted session key **********");
             System.Diagnostics.Debug.WriteLine(_sessionKey);
-            string encryptedSessionKey = _keyExchangeService.EncryptSessionKey(_sessionKey);
+
+            string encryptedSessionKey = EncryptSessionKey(_sessionKey);
             System.Diagnostics.Debug.WriteLine("********** Encrypted session key **********");
             System.Diagnostics.Debug.WriteLine(encryptedSessionKey);
+
             string sessionKeyHash = CalculateHash(_sessionKey);
-            string sessionKeySignature = _signatureService.SignData(_sessionKey);
+            string sessionKeySignature = SignData(_sessionKey);
 
             await SendMessage(encryptedSessionKey, false);  //5
             if (ReceiveMessage() == "session key recv")
@@ -215,6 +231,48 @@ namespace SafeChat
                         }
                     }
                 }
+            }
+        }
+
+        public string EncryptSessionKey(string sessionKey)
+        {
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportParameters(_remotePublicKey);
+                byte[] encryptedKey = rsa.Encrypt(Encoding.UTF8.GetBytes(sessionKey), RSAEncryptionPadding.OaepSHA256);
+                return Convert.ToBase64String(encryptedKey);
+            }
+        }
+
+        public string DecryptSessionKey(string encryptedSessionKey)
+        {
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportParameters(_privateKey);
+                byte[] decryptedKey = rsa.Decrypt(Convert.FromBase64String(encryptedSessionKey), RSAEncryptionPadding.OaepSHA256);
+                return Encoding.UTF8.GetString(decryptedKey);
+            }
+        }
+
+        public string SignData(string data)
+        {
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportParameters(_privateKey);
+                byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+                byte[] signature = rsa.SignData(dataBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+                return Convert.ToBase64String(signature);
+            }
+        }
+
+        public bool VerifySignature(string data, string signature)
+        {
+            using (RSA rsa = RSA.Create())
+            {
+                rsa.ImportParameters(_remotePublicKey);
+                byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+                byte[] signatureBytes = Convert.FromBase64String(signature);
+                return rsa.VerifyData(dataBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             }
         }
 
