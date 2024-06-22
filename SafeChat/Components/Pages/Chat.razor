@@ -59,8 +59,8 @@
 
             socketService = new SocketServiceGeneric(privateKey, publicKey);
             socketService.ConnectionEstablished += OnConnectionEstablished;
-            socketService.ConnectionClosed += OnConnectionClosed;
             socketService.MessageReceived += OnMessageReceived;
+            socketService.ConnectionClosed += OnConnectionClosed;
 
             await socketService.StartConnection(role, ip, int.Parse(port));
         }
@@ -76,16 +76,18 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void OnConnectionClosed()
-    {
-        isConnected = false;
-        InvokeAsync(StateHasChanged);
-    }
-
     private void OnMessageReceived(string message)
     {
         messages.Add(new ChatMessage { Content = message, SentByMe = false });
         InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleEnterKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" || e.Key == "NumpadEnter")
+        {
+            SendMessage();
+        }
     }
 
     private async void SendMessage()
@@ -104,12 +106,10 @@
         }
     }
 
-    private void HandleEnterKey(KeyboardEventArgs e)
+    private void OnConnectionClosed()
     {
-        if (e.Key == "Enter" || e.Key == "NumpadEnter")
-        {
-            SendMessage();
-        }
+        isConnected = false;
+        InvokeAsync(StateHasChanged);
     }
 
     private void GoBack()
@@ -118,7 +118,7 @@
         NavigationManager.NavigateTo("/");
     }
 
-    public void Dispose()
+    private void Dispose()
     {
         if (socketService == null)
         {
