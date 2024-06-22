@@ -25,7 +25,7 @@ namespace SafeChat
         public SocketServiceGeneric(RSAParameters privateKey, RSAParameters publicKey)
         {
             _keyExchangeService = new KeyExchangeServiceRSA(privateKey, publicKey);
-            _signatureService = new SignatureServiceRSA(privateKey, publicKey);
+            _signatureService = new SignatureServiceRSA(privateKey);
         }
 
         public override async Task StartConnection(string role, string host, int port)
@@ -72,6 +72,7 @@ namespace SafeChat
         {
             string clientPublicKey = await ReceiveMessage();    // 2
             await _keyExchangeService.SetRemotePublicKey(clientPublicKey);
+            await _signatureService.SetRemotePublicKey(clientPublicKey);
             string serverPublicKey = await _keyExchangeService.GetPublicKey();
             await SendMessage(serverPublicKey, false);  // 3
 
@@ -103,6 +104,7 @@ namespace SafeChat
             await SendMessage(clientPublicKey, false);  //1
             string serverPublicKey = await ReceiveMessage();    //4
             await _keyExchangeService.SetRemotePublicKey(serverPublicKey);
+            await _signatureService.SetRemotePublicKey(clientPublicKey);
 
             _sessionKey = await _encryptionService.GenerateSessionKey();
             System.Diagnostics.Debug.WriteLine("********** Unencrypted session key **********");

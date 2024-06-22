@@ -6,12 +6,11 @@ namespace SafeChat
     public class SignatureServiceRSA : SignatureService
     {
         private RSAParameters _privateKey;
-        private RSAParameters _publicKey;
+        private RSAParameters _remotePublicKey;
 
-        public SignatureServiceRSA(RSAParameters privateKey, RSAParameters publicKey)
+        public SignatureServiceRSA(RSAParameters privateKey)
         {
             _privateKey = privateKey;
-            _publicKey = publicKey;
         }
 
         public override string SignData(string data)
@@ -27,13 +26,33 @@ namespace SafeChat
 
         public override bool VerifySignature(string data, string signature)
         {
-            return true;
             using (RSA rsa = RSA.Create())
             {
-                rsa.ImportParameters(_publicKey);
+                rsa.ImportParameters(_remotePublicKey);
                 byte[] dataBytes = Encoding.UTF8.GetBytes(data);
                 byte[] signatureBytes = Convert.FromBase64String(signature);
                 return rsa.VerifyData(dataBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            }
+        }
+
+        public Task SetRemotePublicKey(string publicKey)
+        {
+            if (string.IsNullOrEmpty(publicKey))
+            {
+                throw new ArgumentNullException(nameof(publicKey), "Public key cannot be null or empty.");
+            }
+            try
+            {
+                using (RSA rsa = RSA.Create())
+                {
+                    rsa.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
+                    _remotePublicKey = rsa.ExportParameters(false);
+                }
+                return Task.CompletedTask;
+            }
+            catch (FormatException)
+            {
+                throw new ArgumentException("The provided public key is not a valid Base64 string.");
             }
         }
     }
