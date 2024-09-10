@@ -1,6 +1,6 @@
 # P2P Chat with RSA and AES Encryption
 
-![uml 1](https://github.com/user-attachments/assets/f934f590-a36d-4393-819d-581cedf50d04)
+![pP91IyD048Nl-HLpKw6z27eG8YsnM14lNV2-fjDaQB9RTYVL-klDDaCmi8sA8DvQzflttipBpBDstDHLedEs3hAAqB3yKUZsw98aJU7149Ekw5qpMGDfcdGaJ6zb1cxW7WqwpGWhDOSj7c2doSN0p1g3EGDRy3RV8YUTLO3armcr21XH2uaVsud5MrvgK-0mRp-eqAnXrxnKb0U3JzeT74](https://github.com/user-attachments/assets/1ca0dbc2-1439-49bd-b176-810b6ba2bef8)
 
 ![awaiting](https://github.com/user-attachments/assets/850f7c45-cb01-40cf-b2f2-98b40026bb28)
 
