@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a simple P2P (peer-to-peer) chat application implemented in C#. The application ensures secure communication between two parties by utilizing RSA and AES encryption, hashing for message integrity, and digital signatures for authentication. The application is built using the `.NET` framework and the `System.Security.Cryptography` library.
+This is a simple P2P (peer-to-peer) chat application implemented in C#. The application ensures secure communication between two parties by utilizing RSA and AES encryption, hashing for message integrity, and digital signatures for authentication. The application is built using the `.NET` and the `System.Security.Cryptography` library.
 
 ## Features
 
