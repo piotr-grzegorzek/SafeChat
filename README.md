@@ -1,5 +1,11 @@
 # P2P Chat with RSA and AES Encryption
 
+![uml 1](https://github.com/user-attachments/assets/f934f590-a36d-4393-819d-581cedf50d04)
+
+![awaiting](https://github.com/user-attachments/assets/850f7c45-cb01-40cf-b2f2-98b40026bb28)
+
+![connected](https://github.com/user-attachments/assets/cb0a8388-0d28-491b-ab6c-2c7379a77d87)
+
 ## Overview
 
 This is a simple P2P (peer-to-peer) chat application implemented in C#. The application ensures secure communication between two parties by utilizing RSA and AES encryption, hashing for message integrity, and digital signatures for authentication. The application is built using the `.NET` and the `System.Security.Cryptography` library.
